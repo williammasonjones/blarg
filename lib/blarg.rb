@@ -13,10 +13,10 @@ module Promptable
   def prompt(question, validator, error_msg, clear: nil)
     `clear` if clear
     puts "\n#{question}\n"
-    result = gets.chomp
+    result = $stdin.gets.chomp
     until result =~ validator
       puts "\n#{error_msg}\n"
-      result = gets.chomp
+      result = $stdin.gets.chomp
     end
     puts
     result
@@ -57,9 +57,9 @@ class PostImporter
       puts "(#{i}) -- #{File.basename(post)}"
     end
     result = prompt("Which post would you like to import from your previous blog?",
-                    /^#{choices.keys.join('|')}$/,
+                    /^#{@choices.keys.join('|')}$/,
                     "Please choose one of the listed numeric options.")
-    path = @choices[result]
+    path = @choices[result.to_i]
     parse_post(path)
   end
 
@@ -98,6 +98,7 @@ class BlogApp
 
   def run
     puts "Hello there. Welcome to your personal blaaaarg!"
+    post_screen
   end
 
   def self.quit_handler
@@ -123,7 +124,7 @@ class BlogApp
   end
 
   def post_screen
-    message = "Would you like to (1) write a new post, (2) import a post from another blog, (3) view an existing post, or (QUIT)?"
+    message = "Would you like to (1) write a new post, (2) import a post from another blog, (3) find an existing post, or (QUIT)?"
     choice = prompt(message, /^([123]|QUIT)$/, "Please choose 1, 2, 3, or QUIT.", clear: true)
     case choice.to_i
     when 1
@@ -131,7 +132,8 @@ class BlogApp
     when 2
       import_post
     when 3
-      view_post
+      # TODO: We might want to edit or delete a post that we find.
+      find_post
     else
       BlogApp.quit_handler
     end
