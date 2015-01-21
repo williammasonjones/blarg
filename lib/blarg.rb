@@ -2,6 +2,7 @@ require "blarg/version"
 require 'pry'
 require 'camping'
 
+# NOTE: BLOG_REPO has to end with a slash/.
 BLOG_REPO = '/Users/brit/projects/improvedmeans/'
 
 Camping.goes :Blarg
