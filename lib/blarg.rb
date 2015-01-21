@@ -8,7 +8,6 @@ module Blarg
   end
 end
 
-
 module Promptable
   def prompt(question, validator, error_msg, clear: nil)
     `clear` if clear
@@ -98,6 +97,7 @@ class BlogApp
 
   def run
     puts "Hello there. Welcome to your personal blaaaarg!"
+    # TODO: Have choose method for post screen or index screen.
     post_screen
   end
 
