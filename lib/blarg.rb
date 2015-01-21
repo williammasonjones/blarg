@@ -26,6 +26,7 @@ class PostImporter
     File.open(file, 'r') do |f|
       result = parse_header(f)
       result[:text] = f.read
+      result[:date] = DateTime.parse(result[:date])
       result[:tags].split(', ')
     end
     result
@@ -58,6 +59,11 @@ class PostImporter
 end
 
 class BlogApp
+
+  def run
+    puts "Hello there. Welcome to your personal blaaaarg!"
+  end
+
   private
   def prompt(question, validator, error_msg, clear: nil)
     `clear` if clear
@@ -72,3 +78,6 @@ class BlogApp
     result
   end
 end
+
+blog = BlogApp.new
+blog.run
