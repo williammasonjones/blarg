@@ -46,7 +46,7 @@ class PostImporter
       result = parse_header(f)
       result[:text] = f.read
       result[:date] = DateTime.parse(result[:date])
-      result[:tags].split(', ')
+      result[:tags] = result[:tags].split(', ')
     end
     result
   end
