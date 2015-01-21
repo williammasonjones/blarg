@@ -1,10 +1,42 @@
 require "blarg/version"
 require 'pry'
+require 'camping'
 
 BLOG_REPO = '/Users/brit/projects/improvedmeans/'
 
+Camping.goes :Blarg
+
 module Blarg
   module Models
+    class Post < Base
+      serialize :tags
+    end
+
+    class InitializeDatabase < V 1.0
+      def self.up
+        create_table Post.table_name do |t|
+          t.string :title
+          t.string :tags
+          t.string :format
+          t.datetime :written
+          t.text :text
+        end
+      end
+
+      def self.down
+        drop_table Post.table_name
+      end
+    end
+
+    class RenameWrittenToDate < V 1.1
+      def self.up
+        rename_column Post.table_name, :written, :date
+      end
+
+      def self.down
+        rename_column Post.table_name, :date, :written
+      end
+    end
   end
 end
 
@@ -153,5 +185,9 @@ class BlogApp
   end
 end
 
-blog = BlogApp.new
-blog.run
+def Blarg.create
+  Blarg::Models.create_schema
+end
+
+#blog = BlogApp.new
+#blog.run
