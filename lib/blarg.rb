@@ -2,7 +2,7 @@ require "blarg/version"
 require 'pry'
 require 'camping'
 
-BLOG_REPO = '/Users/brit/projects/improvedmeans/'
+BLOG_REPO = '/Users/williamjones/Projects/tiy/blarg/improvedmeans/'
 
 Camping.goes :Blarg
 
