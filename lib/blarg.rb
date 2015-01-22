@@ -10,7 +10,18 @@ Camping.goes :Blarg
 module Blarg
   module Models
     class Post < Base
-      serialize :tags
+      has_many :post_tags
+      has_many :tags, through: :post_tags
+    end
+
+    class Tag < Base
+      has_many :post_tags
+      has_many :posts, through: :post_tags
+    end
+
+    class PostTag < Base
+      belongs_to :post
+      belongs_to :tag
     end
 
     class InitializeDatabase < V 1.0
@@ -36,6 +47,57 @@ module Blarg
 
       def self.down
         rename_column Post.table_name, :date, :written
+      end
+    end
+
+    class AddTagsTable < V 1.2
+      def self.up
+        create_table Tag.table_name do |t|
+          t.string :name, uniqueness: true
+          t.timestamps
+        end
+      end
+
+      def self.down
+        drop_table Tag.table_name
+      end
+    end
+
+    class AddPostTagTable < V 1.3
+      def self.up
+        create_table PostTag.table_name do |t|
+          t.integer :post_id, index: true
+          t.integer :tag_id, index: true
+        end
+      end
+
+      def self.down
+        drop_table Tagging.table_name
+      end
+    end
+
+    class FillPostTags < V 1.4
+      def self.up
+        Post.find_each do |post|
+          post.tags.each do |t|
+            tag = Tag.find_or_create_by(:name => t)
+            PostTag.create(:post_id => post.id, :tag_id => tag.id)
+          end
+        end
+      end
+
+      def self.down
+        raise ActiveRecord::IrreversibleMigration
+      end
+    end
+
+    class RemoveTagsColumnFromPosts < V 1.5
+      def self.up
+        remove_column Post.table_name, :tags
+      end
+
+      def self.down
+        add_column Post.table_name, :tags, :string
       end
     end
   end
@@ -191,5 +253,19 @@ def Blarg.create
   Blarg::Models.create_schema
 end
 
-#blog = BlogApp.new
-#blog.run
+def top_months(n)
+  result = Hash.new(0)
+  Blarg::Models::Post.find_each do |post|
+    result[post.date.month] += 1
+  end
+  #result.sort_by { || }
+end
+
+def top_months(n)
+  sqlite_month = "strftime('%y-%m', date)"
+  grouped = Blarg::Models::Post.select(sqlite_month).group(sqlite_month)
+  ordered = grouped.count.sort_by { |k, v| -v}.to_h
+  ordered.first(n).each do |m, posts|
+    puts "Blogged #{posts} times in #{m}"
+  end
+end
