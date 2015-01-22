@@ -2,6 +2,7 @@ require "blarg/version"
 require 'pry'
 require 'camping'
 
+# NOTE: BLOG_REPO has to end with a slash/.
 BLOG_REPO = '/Users/williamjones/Projects/tiy/blarg/improvedmeans/'
 
 Camping.goes :Blarg
@@ -140,18 +141,19 @@ class BlogApp
 
   private
   def import_post
-    more = prompt("Would you like to import another post? (yes/y, no/n, all)",
+    choice = prompt("Would you like to import a post? (yes/y, no/n, all)",
                   /^y|yes|n|no|all$/, "Please choose 'y', 'yes', 'n', 'no', or 'all'.")
-    until ['n', 'no'].include?(more)
-      if more == 'all'
-        @importer.each do |p|
-          opts = @importer.parse_post(p)
-          Blarg::Models::Post.create(opts)
-        end
-      else
-        opts = @importer.choose_post
+    if choice == 'all'
+      @importer.each do |p|
+        opts = @importer.parse_post(p)
         Blarg::Models::Post.create(opts)
       end
+    elsif ['y','yes'].include?(choice)
+      opts = @importer.choose_post
+      Blarg::Models::Post.create(opts)
+    else
+      puts "Your posts are imported. Thanks for stopping by!"
+      BlogApp.quit_handler
     end
   end
 
